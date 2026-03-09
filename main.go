@@ -132,8 +132,8 @@ func Parsfile(filename string) {
 			if expectStartRoom || expectEndRoom {
 				fmt.Println("ERROR: invalid data format")
 				return
-			}
-
+			}   
+   
 			seenLinks = true
 
 			ab := strings.Split(line, "-")
@@ -249,12 +249,12 @@ func Parsfile(filename string) {
 		fmt.Println("ERROR: invalid data format")
 		return
 	}
-
+	fmt.Println(Bfs(farm, Room))
 	// Optional debug
-	fmt.Println("Ants:", farm.Ants)
-	fmt.Println("Start:", farm.Start)
-	fmt.Println("End:", farm.End)
-	fmt.Println("Rooms:", len(farm.Rooms))
+	// fmt.Println("Ants:", farm.Ants)
+	// fmt.Println("Start:", farm.Start)
+	// fmt.Println("End:", farm.End)
+	// fmt.Println("Rooms:", len(farm.Rooms))
 	fmt.Println("Adj:", farm.Adj)
 }
 
