@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-func Bfs(farm Farm, room Room) []string {
+func Bfs(farm Farm) []string {
 	queue := []string{farm.Start}
 
 	visite := make(map[string]bool)
@@ -50,6 +50,6 @@ func Bfs(farm Farm, room Room) []string {
 	for i := len(rev) - 1; i >= 0; i-- {
 		path = append(path, rev[i])
 	}
-
+	fmt.Println(Simulation(path, farm.Ants))
 	return path
 }
