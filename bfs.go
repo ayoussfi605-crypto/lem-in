@@ -1,55 +1,35 @@
 package main
 
-import (
-	"fmt"
-)
-
-func Bfs(farm Farm) []string {
-	queue := []string{farm.Start}
-
-	visite := make(map[string]bool)
-	visite[farm.Start] = true
-
-	parent := make(map[string]string)
+// kol mra kankhrj path mn l queue kanchof akhit node wkanzid liha ng jdad bach nwsa3 dak lpath hta twsl l end
+func Bfs(farm Farm) {
+	// paths incomplete
+	queue := [][]string{{farm.Start}}
+	// paths complete
+	var allpaths [][]string
 
 	for len(queue) > 0 {
 
-		current := queue[0]
+		path := queue[0]
 		queue = queue[1:]
-
-		if current == farm.End {
-			break
+		last := path[len(path)-1]
+		// path already completed zslat l end
+		if last == farm.End {
+			allpaths = append(allpaths, path)
+			continue //continue maghadich nzid nws3 had l path bcause already wslat l end
 		}
 
-		for _, ng := range farm.Adj[current] {
-			if !visite[ng] {
+		for _, ng := range farm.Adj[last] {
+			// check if ng is existe in path
+			if !Contains(path, ng) {
+				newpath := append([]string{}, path...)
+				newpath = append(newpath, ng)
 
-				visite[ng] = true
-				parent[ng] = current
-
-				queue = append(queue, ng)
+				queue = append(queue, newpath)
 			}
 		}
+	}
+	var allSets [][][]string
+	BuildSets(allpaths, 0, [][]string{}, &allSets)
 
-	}
-	if !visite[farm.End] {
-		return nil
-	}
-	fmt.Println("parent :",parent)
-	rev := []string{}
-	d := farm.End
-
-	for {
-		rev = append(rev, d)
-		if d == farm.Start {
-			break
-		}
-		d = parent[d]
-	}
-	path := []string{}
-	for i := len(rev) - 1; i >= 0; i-- {
-		path = append(path, rev[i])
-	}
-	fmt.Println(Simulation(path, farm.Ants))
-	return path
+	bestset(allSets)
 }

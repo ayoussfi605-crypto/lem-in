@@ -249,14 +249,13 @@ func Parsfile(filename string) {
 		fmt.Println("ERROR: invalid data format")
 		return
 	}
-	fmt.Println(Bfs(farm))
-	
+	Bfs(farm)
 	// Optional debug
 	// fmt.Println("Ants:", farm.Ants)
 	// fmt.Println("Start:", farm.Start)
 	// fmt.Println("End:", farm.End)
 	// fmt.Println("Rooms:", len(farm.Rooms))
-	// fmt.Println("Adj:", farm.Adj)
+	fmt.Println("Adj:", farm.Adj)
 }
 
 func normTunnelKey(a, b string) string {
