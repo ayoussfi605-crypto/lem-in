@@ -31,5 +31,5 @@ func Bfs(farm Farm) {
 	var allSets [][][]string
 	BuildSets(allpaths, 0, [][]string{}, &allSets)
 
-	bestset(allSets)
+	Bestset(allSets)
 }
