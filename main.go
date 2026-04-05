@@ -257,7 +257,10 @@ func Parsfile(filename string) {
 	antsReady := Divisionofants(bestSet, farm.Ants)
 
 	// 1. Print input data (Ants, Rooms, Links)
-	fmt.Println(farm.RawLines)
+	for _, r := range farm.RawLines{
+
+		fmt.Println(r)
+	}
 	fmt.Println() // Khlliw s-tr khawi bin l-data u l-moves
 
 	// 3. Simuli l-movement (Solve)
