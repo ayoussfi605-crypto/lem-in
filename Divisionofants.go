@@ -1,6 +1,9 @@
 package main
 
-import "sort"
+import (
+	"fmt"
+	"sort"
+)
 
 type Ant struct {
 	ID   int      // L1, L2, L3...
@@ -9,6 +12,11 @@ type Ant struct {
 }
 
 func Divisionofants(bestSet [][]string, totalAnts int) []Ant {
+	// 1. Check ila l-BFS ma-lqat walo (Critical Check)
+	if len(bestSet) == 0 {
+		fmt.Println("Error: No paths found between start and end.")
+		return []Ant{}
+	}
 	// 1. Distribution Logic (L-7sab)
 	// antsPerPath[i] k-t-goul lina ch7al mn nemla f-l-path i
 	antsPerPath := make([][]int, len(bestSet))
