@@ -249,13 +249,19 @@ func Parsfile(filename string) {
 		fmt.Println("ERROR: invalid data format")
 		return
 	}
-	Bfs(farm)
-	// Optional debug
-	// fmt.Println("Ants:", farm.Ants)
-	// fmt.Println("Start:", farm.Start)
-	// fmt.Println("End:", farm.End)
-	// fmt.Println("Rooms:", len(farm.Rooms))
-	fmt.Println("Adj:", farm.Adj)
+	allPaths := Bfs(farm)
+	// 1. Lqa l-paths
+	bestSet := GetBestSet(allPaths, farm.Ants)
+
+	// 2. Farraq n-nmel 3la l-paths
+	antsReady := Divisionofants(bestSet, farm.Ants)
+
+	// 1. Print input data (Ants, Rooms, Links)
+	fmt.Println(farm.RawLines)
+	fmt.Println() // Khlliw s-tr khawi bin l-data u l-moves
+
+	// 3. Simuli l-movement (Solve)
+	Solve(antsReady, farm)
 }
 
 func normTunnelKey(a, b string) string {

@@ -1,79 +1,45 @@
 package main
 
-// compatible selection
-func BuildSets(allpaths [][]string, index int, current [][]string, result *[][][]string) {
-	if index == len(allpaths) {
-		if len(current) > 0 {
-			temp := make([][]string, len(current))
-			copy(temp, current)
-			*result = append(*result, temp)
-		}
-		return
-	}
+import (
+	"sort"
+)
 
-	BuildSets(allpaths, index+1, current, result)
+func GetBestSet(allPaths [][]string, totalAnts int) [][]string {
+	// 1. Sort paths by length (Dima qsar homa l-uwwal)
+	sort.Slice(allPaths, func(i, j int) bool {
+		return len(allPaths[i]) < len(allPaths[j])
+	})
 
-	if canAdd(current, allpaths[index]) {
-		newCurrent := append([][]string{}, current...)
-		newCurrent = append(newCurrent, allpaths[index])
+	var bestSet [][]string
+	minTurns := 1<<31 - 1
 
-		BuildSets(allpaths, index+1, newCurrent, result)
-	}
+	// 2. Greedy Loop: Jarreb n-bniw sets m-khtalfin
+	// Koul mra n-bdaw b-path m-khtalfa (i) u n-choufou chkun li mzyan m3aha
+	limit := len(allPaths)
+	if limit > 100 {
+		limit = 100
+	} // Bach n-kunu sra3
 
-}
+	for i := 0; i < limit; i++ {
+		currentSet := [][]string{allPaths[i]}
 
-func canAdd(current [][]string, path []string) bool {
-	for _, p := range current {
-		if !compatible(p, path) {
-			return false
-		}
-	}
-	return true
-}
+		for j := 0; j < len(allPaths); j++ {
+			if i == j {
+				continue
+			}
 
-func compatible(path1, path2 []string) bool {
-	for i := 1; i < len(path1)-1; i++ {
-		for j := 1; j < len(path2)-1; j++ {
-			if path1[i] == path2[j] {
-				return false
+			// Ila kant had l-triq (j) ma-m-charkach f l-biutan m3a l-set l-7aliya
+			if !HasCollision(allPaths[j], currentSet) {
+				currentSet = append(currentSet, allPaths[j])
 			}
 		}
+
+		// 3. 7seb ch7al mn turn ghadi n-7taju b had l-set
+		turns := CalculateTurns(currentSet, totalAnts)
+		if turns < minTurns {
+			minTurns = turns
+			bestSet = currentSet
+		}
 	}
-	return true
+	return bestSet
 }
-
-// package main
-
-// // compatible selection
-// func Compatiblepaths(allpaths [][]string){
-// 	var newallpath [][]string
-
-// 	newallpath = append(newallpath, allpaths[0])
-
-// 	for i := 1; i < len(allpaths); i++ {
-// 		// if allpath[i] != newallpath '(canadd)' append allpath[i] to newallpath
-// 		if canadd(newallpath, allpaths[i]) {
-// 			newallpath = append(newallpath, allpaths[i])
-// 		}
-// 	}
-// }
-
-// func canadd(newallpath [][]string, path []string) bool {
-// 	for _, p := range newallpath {
-// 		if !compatible(p, path) {
-// 			return false
-// 		}
-// 	}
-// 	return true
-// }
-
-// func compatible(path1, path2 []string) bool {
-// 	for i := 1; i < len(path1)-1; i++ {
-// 		for j := 1 ; j < len(path2)-1; j++{
-// 			if path1[i] == path2[j]{
-// 				return false
-// 			}
-// 		}
-// 	}
-// 	return true
-// }
