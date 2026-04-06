@@ -24,17 +24,17 @@ func Solve(ants []Ant, farm Farm) {
 			}
 
 			nextIdx := ants[i].Step + 1
+			currRoom := ants[i].Path[ants[i].Step]
 			nextRoom := ants[i].Path[nextIdx]
 
 			// Move if the next room is free or is the end
-			if !occupied[nextRoom] || nextRoom == farm.End {
+			if !occupied[currRoom+nextRoom] {
 				ants[i].Step = nextIdx
 				moves = append(moves, fmt.Sprintf("L%d-%s", ants[i].ID, nextRoom))
 
+				occupied[currRoom+nextRoom] = true
 				if nextRoom == farm.End {
 					finished++
-				} else {
-					occupied[nextRoom] = true
 				}
 			}
 		}
