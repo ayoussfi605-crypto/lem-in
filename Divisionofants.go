@@ -5,26 +5,29 @@ import (
 	"sort"
 )
 
+// Ant represents an ant with its ID, assigned path, and current position.
 type Ant struct {
-	ID   int      // L1, L2, L3...
-	Path []string // Triq li ghadi t-ched
-	Step int      // Fin wsset f-l-index d l-path
+	ID   int      // Unique ID (L1, L2, etc.)
+	Path []string // The path this ant follows
+	Step int      // Current index in the path (0 = start)
 }
 
+// Divisionofants distributes ants across the best set of paths using greedy assignment.
+// It assigns each ant to the path that would minimize the total turns.
 func Divisionofants(bestSet [][]string, totalAnts int) []Ant {
-	// 1. Check ila l-BFS ma-lqat walo (Critical Check)
+	// Check for valid input
 	if len(bestSet) == 0 {
 		fmt.Println("Error: No paths found between start and end.")
 		return []Ant{}
 	}
-	// 1. Distribution Logic (L-7sab)
-	// antsPerPath[i] k-t-goul lina ch7al mn nemla f-l-path i
+
+	// antsPerPath[i] = number of ants on path i
 	antsPerPath := make([][]int, len(bestSet))
 
+	// Distribute ants greedily
 	for antID := 1; antID <= totalAnts; antID++ {
 		bestIdx := 0
-		// Score = toul d l-path + ch7al mn nemla aslan fiha
-		minScore := len(bestSet[0]) + len(antsPerPath[0])
+		minScore := len(bestSet[0]) + len(antsPerPath[0]) // Score = path length + current ants
 
 		for i := 1; i < len(bestSet); i++ {
 			score := len(bestSet[i]) + len(antsPerPath[i])
@@ -36,20 +39,19 @@ func Divisionofants(bestSet [][]string, totalAnts int) []Ant {
 		antsPerPath[bestIdx] = append(antsPerPath[bestIdx], antID)
 	}
 
-	// 2. Map IDs to Ant structs
-	// Ghadi n-creaw ga3 n-nmel u n-3tiw l-koll nemla l-path dyalha
+	// Create Ant structs
 	var allAnts []Ant
 	for i, antIDs := range antsPerPath {
 		for _, id := range antIDs {
 			allAnts = append(allAnts, Ant{
 				ID:   id,
 				Path: bestSet[i],
-				Step: 0, // Dima k-i-bdaw mn Start
+				Step: 0, // Start at the beginning
 			})
 		}
 	}
 
-	// 3. Sort by ID (Bach n-releasiw L1, L2, L3... b-tartib)
+	// Sort by ID for consistent output
 	sort.Slice(allAnts, func(i, j int) bool {
 		return allAnts[i].ID < allAnts[j].ID
 	})

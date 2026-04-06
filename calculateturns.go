@@ -1,17 +1,18 @@
 package main
 
-// L-mo7arrik li k-i-goul lik chkun hwa l-Best Set
+// CalculateTurns computes the minimum number of turns needed to move all ants
+// using the given set of paths. It uses a water-filling approach to distribute ants.
 func CalculateTurns(paths [][]string, ants int) int {
 	if len(paths) == 0 {
-		return 1<<31 - 1
+		return 1<<31 - 1 // Max int, indicating invalid
 	}
 
-	// Water-filling logic
+	// pathAnts[i] = number of ants assigned to path i
 	pathAnts := make([]int, len(paths))
 	for a := 0; a < ants; a++ {
+		// Find the path with the lowest current score (length + ants already on it)
 		best := 0
 		for i := 1; i < len(paths); i++ {
-			// score = path_length + ants_already_on_it
 			if len(paths[i])+pathAnts[i] < len(paths[best])+pathAnts[best] {
 				best = i
 			}
@@ -19,6 +20,7 @@ func CalculateTurns(paths [][]string, ants int) int {
 		pathAnts[best]++
 	}
 
+	// The maximum turns is the max over all paths of (path length + ants on it - 1)
 	maxTurns := 0
 	for i := range paths {
 		turns := len(paths[i]) + pathAnts[i] - 1

@@ -29,9 +29,10 @@ func main() {
 }
 
 func Parsfile(filename string) {
+	// Read the input file
 	inputfile, err := os.ReadFile(filename)
 	if err != nil {
-		fmt.Println("ERROR: invalid data format")
+		fmt.Println("ERROR: invalid data format, cannot read file")
 		return
 	}
 
@@ -42,20 +43,17 @@ func Parsfile(filename string) {
 
 	content := string(inputfile)
 	if content == "" {
-		fmt.Println("ERROR: invalid data format")
+		fmt.Println("ERROR: invalid data format, empty file")
 		return
 	}
 	lines := strings.Split(strings.TrimRight(content, "\n"), "\n")
 	farm.RawLines = lines
 
+	// Flags and maps for validation
 	foundAnts := false
-	// check if alredy exist
 	seenStartCmd, seenEndCmd := false, false
-	// next room is start or end room
 	expectStartRoom, expectEndRoom := false, false
-	// if find this - next line He should is link if She was room... err
 	seenLinks := false
-	// "Two rooms can't have more than one tunnel connecting them".
 	seenTunnels := make(map[string]bool)
 	seenCoords := make(map[string]bool)
 
@@ -65,28 +63,28 @@ func Parsfile(filename string) {
 			continue
 		}
 
-		// Handle Commands
+		// Handle Commands (##start, ##end)
 		if strings.HasPrefix(line, "##") {
 			if !foundAnts {
-				fmt.Println("ERROR: invalid data format")
+				fmt.Println("ERROR: invalid data format, commands before ant count")
 				return
 			}
 			if line == "##start" {
-				if seenLinks || seenStartCmd {
-					fmt.Println("ERROR: invalid data format")
+				if seenLinks || seenStartCmd || expectStartRoom || expectEndRoom {
+					fmt.Println("ERROR: invalid data format, duplicate or misplaced start command")
 					return
 				}
 				seenStartCmd, expectStartRoom = true, true
 				continue
 			} else if line == "##end" {
-				if seenLinks || seenEndCmd {
-					fmt.Println("ERROR: invalid data format")
+				if seenLinks || seenEndCmd || expectStartRoom || expectEndRoom {
+					fmt.Println("ERROR: invalid data format, duplicate or misplaced end command")
 					return
 				}
 				seenEndCmd, expectEndRoom = true, true
 				continue
 			} else {
-				// Ignore unknown commands (like ##anything)
+				// Ignore unknown commands
 				continue
 			}
 		}
@@ -96,11 +94,11 @@ func Parsfile(filename string) {
 			continue
 		}
 
-		// Parse Ants (First valid non-comment line)
+		// Parse Ants (first valid non-comment line)
 		if !foundAnts {
 			ants, err := strconv.Atoi(line)
 			if err != nil || ants <= 0 || strings.Contains(line, " ") {
-				fmt.Println("ERROR: invalid data format")
+				fmt.Println("ERROR: invalid data format, invalid number of ants")
 				return
 			}
 			farm.Ants = ants
@@ -108,79 +106,74 @@ func Parsfile(filename string) {
 			continue
 		}
 
-		// Links Check (A-B)
+		// Parse Links (A-B)
 		if strings.Count(line, "-") == 1 && !strings.Contains(line, " ") {
-			// He should To be room after flag ##start/end
 			if expectStartRoom || expectEndRoom {
-				fmt.Println("ERROR: invalid data format")
+				fmt.Println("ERROR: invalid data format, link instead of room after command")
 				return
 			}
 			seenLinks = true
 			ab := strings.Split(line, "-")
 			a, b := ab[0], ab[1]
 			if _, ok1 := farm.Rooms[a]; !ok1 {
-				fmt.Println("ERROR: invalid data format")
+				fmt.Println("ERROR: invalid data format, link to unknown room")
 				return
 			}
-			// if this room a or b Available in map if not err
 			if _, ok2 := farm.Rooms[b]; !ok2 {
-				fmt.Println("ERROR: invalid data format")
+				fmt.Println("ERROR: invalid data format, link to unknown room")
 				return
 			}
-			// Self-linking
 			if a == b {
-				fmt.Println("ERROR: invalid data format")
+				fmt.Println("ERROR: invalid data format, self-linking room")
 				return
 			}
-			// Duplicate Tunnels Check
 			key := normTunnelKey(a, b)
 			if seenTunnels[key] {
-				fmt.Println("ERROR: invalid data format")
+				fmt.Println("ERROR: invalid data format, duplicate tunnel")
 				return
 			}
-
-			// if not available
 			seenTunnels[key] = true
 			farm.Adj[a] = append(farm.Adj[a], b)
 			farm.Adj[b] = append(farm.Adj[b], a)
 			continue
 		}
 
-		// Rooms Check (Name X Y)
+		// Parse Rooms (Name X Y)
 		parts := strings.Fields(line)
 		if len(parts) == 3 {
 			if seenLinks {
-				fmt.Println("ERROR: invalid data format")
+				fmt.Println("ERROR: invalid data format, rooms after links")
+				return
+			}
+			if expectStartRoom && expectEndRoom {
+				fmt.Println("ERROR: invalid data format, both start and end expected simultaneously")
 				return
 			}
 			name := parts[0]
 			if strings.HasPrefix(name, "L") || strings.HasPrefix(name, "#") {
-				fmt.Println("ERROR: invalid data format")
+				fmt.Println("ERROR: invalid data format, invalid room name")
 				return
 			}
 			if _, exists := farm.Rooms[name]; exists {
-				fmt.Println("ERROR: invalid data format")
+				fmt.Println("ERROR: invalid data format, duplicate room name")
 				return
 			}
-
 			x, errX := strconv.Atoi(parts[1])
 			y, errY := strconv.Atoi(parts[2])
 			if errX != nil || errY != nil {
-				fmt.Println("ERROR: invalid data format")
+				fmt.Println("ERROR: invalid data format, invalid coordinates")
 				return
 			}
 			coordKey := fmt.Sprintf("%d,%d", x, y)
 			if seenCoords[coordKey] {
-				fmt.Println("ERROR: invalid data format")
+				fmt.Println("ERROR: invalid data format, duplicate coordinates")
 				return
 			}
 			seenCoords[coordKey] = true
-
 			farm.Rooms[name] = Room{Name: name}
 			if _, exists := farm.Adj[name]; !exists {
 				farm.Adj[name] = []string{}
 			}
-
 			if expectStartRoom {
 				farm.Start = name
 				expectStartRoom = false
@@ -192,25 +185,33 @@ func Parsfile(filename string) {
 			continue
 		}
 
-		// Any other line format is an error
-		fmt.Println("ERROR: invalid data format")
+		// Unknown line format
+		fmt.Println("ERROR: invalid data format, unknown line format")
 		return
 	}
 
 	// Final Validation
-	if farm.Start == "" || farm.End == "" || !foundAnts {
-		fmt.Println("ERROR: invalid data format")
+	if farm.Start == "" {
+		fmt.Println("ERROR: invalid data format, no start room found")
+		return
+	}
+	if farm.End == "" {
+		fmt.Println("ERROR: invalid data format, no end room found")
+		return
+	}
+	if !foundAnts {
+		fmt.Println("ERROR: invalid data format, no ant count found")
 		return
 	}
 
 	allPaths := Bfs(farm)
-	// 1. Lqa l-paths
+	// 1. Find all paths from start to end
 	bestSet := GetBestSet(allPaths, farm.Ants)
 
-	// 2. Farraq n-nmel 3la l-paths
+	// 2. Distribute ants across the best set of paths
 	antsReady := Divisionofants(bestSet, farm.Ants)
 	if len(bestSet) == 0 {
-		fmt.Println("ERROR: invalid data format, no paths found")
+		fmt.Println("ERROR: invalid data format, no valid paths found")
 		return
 	}
 	// 1. Print input data (Ants, Rooms, Links)
