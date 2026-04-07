@@ -199,7 +199,6 @@ func Parsfile(filename string) {
 	allPaths := Dfs(farm)
 	// 1. Find all paths from start to end
 	bestSet := GetBestSet(allPaths, farm.Ants)
-	fmt.Println("\n\n\n" + fmt.Sprint(bestSet))
 
 	// 2. Distribute ants across the best set of paths
 	antsReady := Divisionofants(bestSet, farm.Ants)
