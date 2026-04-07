@@ -1,6 +1,7 @@
 package main
 
 import (
+	"math"
 	"sort"
 )
 
@@ -11,7 +12,7 @@ func GetBestSet(allPaths [][]string, totalAnts int) [][]string {
 	})
 
 	var bestSet [][]string
-	minTurns := 1<<31 - 1
+	minTurns := math.MaxInt32
 
 	// 2. Greedy algorithm: Try starting with each path and add compatible ones
 	// Limit to first 100 paths to avoid excessive computation

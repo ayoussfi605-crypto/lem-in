@@ -40,4 +40,4 @@ func Dfs(farm Farm) [][]string {
 
 	dfs(farm.Start)
 	return allPaths
-}
+} 

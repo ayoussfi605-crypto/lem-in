@@ -89,7 +89,7 @@ func Parsfile(filename string) {
 		// Parse Ants (first valid non-comment line)
 		if !foundAnts {
 			ants, err := strconv.Atoi(line)
-			if err != nil || ants <= 0 || ants > 40000000 || strings.Contains(line, " ") {
+			if err != nil || ants <= 0 || strings.Contains(line, " ") {
 				fmt.Println("ERROR: invalid data format, invalid number of ants")
 				return
 			}
@@ -199,6 +199,7 @@ func Parsfile(filename string) {
 	allPaths := Dfs(farm)
 	// 1. Find all paths from start to end
 	bestSet := GetBestSet(allPaths, farm.Ants)
+	fmt.Println("\n\n\n" + fmt.Sprint(bestSet))
 
 	// 2. Distribute ants across the best set of paths
 	antsReady := Divisionofants(bestSet, farm.Ants)
